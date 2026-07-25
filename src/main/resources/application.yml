@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: turbotoggle
+  profiles:
+    active: dev # Default fallback profile for local execution
+
+turbotoggle:
+  evaluation:
+    cache-ttl-seconds: 60
+    enable-audit-logging: true
