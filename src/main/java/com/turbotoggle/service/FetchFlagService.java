@@ -8,6 +8,8 @@ import com.turbotoggle.repository.EnvironmentRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -190,4 +192,17 @@ public class FetchFlagService {
         log.warn("Exhauster retires waititng for lock on env [{}], executing safety DB fallback.", sdkKey);
         return configRepository.findAllFlagPayloadDtosBySdkKey(sdkKey);
     }
+
+    public List<FlagConfigPayloadDto> getFlagConfigs(String sdkKey, List<String> flagKeys) {
+        if (flagKeys == null || flagKeys.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return flagKeys.stream()
+                .map(flagKey -> getFlagConfig(sdkKey, flagKey)) // Returns Optional<FlagConfigPayloadDto>
+                .flatMap(Optional::stream)                     // Filters out empty Optionals cleanly (Java 9+)
+                .toList();                                     // Collects to unmodifiable List (Java 16+)
+    }
+
+
 }

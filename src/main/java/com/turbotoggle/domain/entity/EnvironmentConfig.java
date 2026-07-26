@@ -1,6 +1,5 @@
 package com.turbotoggle.domain.entity;
 
-import com.turbotoggle.domain.model.TargetingRuleDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -40,7 +39,7 @@ public class EnvironmentConfig {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "rules", nullable = false)
-    private List<TargetingRuleDto> rules = new ArrayList<>();
+    private List<TargetingRule> rules = new ArrayList<>();
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "individual_targets", nullable = false)
@@ -56,6 +55,10 @@ public class EnvironmentConfig {
     @PreUpdate
     public void onUpdate() {
         this.updatedAt = Instant.now();
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public EnvironmentConfig() {
@@ -81,7 +84,7 @@ public class EnvironmentConfig {
         return defaultVariation;
     }
 
-    public List<TargetingRuleDto> getRules() {
+    public List<TargetingRule> getRules() {
         return rules;
     }
 
@@ -113,7 +116,7 @@ public class EnvironmentConfig {
         this.defaultVariation = defaultVariation;
     }
 
-    public void setRules(List<TargetingRuleDto> rules) {
+    public void setRules(List<TargetingRule> rules) {
         this.rules = rules;
     }
 

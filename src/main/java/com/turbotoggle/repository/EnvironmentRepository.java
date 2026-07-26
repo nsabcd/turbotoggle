@@ -14,4 +14,8 @@ public interface EnvironmentRepository extends JpaRepository<Environment, Long> 
      * SELECT e FROM Environment e WHERE e.sdkKey = ?
      */
     Optional<Environment> findBySdkKey(String sdkKey);
+    /**
+     * Finds an environment by its unique environment key (e.g., "production", "staging").
+     */
+    Optional<Environment> findByEnvKey(String envKey);
 }

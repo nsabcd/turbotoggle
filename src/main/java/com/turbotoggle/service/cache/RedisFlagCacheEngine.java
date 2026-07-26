@@ -5,7 +5,9 @@ import com.turbotoggle.repository.Cache.FlagCacheRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -90,4 +92,20 @@ public class RedisFlagCacheEngine implements FlagCacheRepository {
     public void evictEnvKeyMapping(String sdkKey) {
         redisTemplate.delete(ENV_CACHE_PREFIX+sdkKey);
     }
+
+    // In FlagCacheRepository & RedisFlagCacheEngine
+    public List<FlagConfigPayloadDto> getFlagsBulk(String sdkKey, List<String> flagKeys) {
+        String key = FLAG_CACHE_PREFIX + sdkKey;
+        List<Object> fields = new ArrayList<>(flagKeys);
+        List<Object> values = redisTemplate.opsForHash().multiGet(key, fields);
+
+        if (values == null) return List.of();
+
+        return values.stream()
+                .filter(Objects::nonNull)
+                .filter(FlagConfigPayloadDto.class::isInstance)
+                .map(FlagConfigPayloadDto.class::cast)
+                .toList();
+    }
+
 }

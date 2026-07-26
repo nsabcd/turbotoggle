@@ -71,4 +71,21 @@ public interface EnvironmentConfigRepository extends JpaRepository<EnvironmentCo
             @Param("sdkKey") String sdkKey
     );
 
+    /**
+     * Finds an EnvironmentConfig by environment key and flag key via entity relationships.
+     */
+    Optional<EnvironmentConfig> findByEnvironmentEnvKeyAndFeatureFlagFlagKey(String envKey, String flagKey);
+
+    // Default method alias so your FlagManagementService code stays clean with findByEnvKeyAndFlagKey
+    default Optional<EnvironmentConfig> findByEnvKeyAndFlagKey(String envKey, String flagKey) {
+        return findByEnvironmentEnvKeyAndFeatureFlagFlagKey(envKey, flagKey);
+    }
+
+    @Query("""
+        SELECT ec FROM EnvironmentConfig ec
+        JOIN ec.environment e
+        WHERE e.sdkKey = :sdkKey
+    """)
+    List<EnvironmentConfig> findAllBySdkKey(@Param("sdkKey") String sdkKey);
+
 }

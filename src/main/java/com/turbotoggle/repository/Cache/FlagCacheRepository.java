@@ -38,4 +38,6 @@ public interface FlagCacheRepository {
      * Releases the distributed lock if the value matches.
      */
     void releaseLock(String lockKey, String lockValue);
+
+    List<FlagConfigPayloadDto> getFlagsBulk(String sdkKey, List<String> flagKeys);
 }
