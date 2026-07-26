@@ -39,11 +39,11 @@ public class EnvironmentConfig {
     private String defaultVariation;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "rules", columnDefinition = "jsonb", nullable = false)
+    @Column(name = "rules", nullable = false)
     private List<TargetingRuleDto> rules = new ArrayList<>();
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "individual_targets", columnDefinition = "jsonb", nullable = false)
+    @Column(name = "individual_targets", nullable = false)
     private Map<String, String> individualTargets = new HashMap<>();
 
     @Version
