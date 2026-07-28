@@ -1,6 +1,5 @@
 plugins {
     `java-library`
-    id("com.gradleup.shadow")
 }
 
 group = "com.turbotoggle"
@@ -22,7 +21,6 @@ val slf4jVersion = "2.0.9"
 dependencies {
     // JSON Parsing
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-    implementation(project(":turbotoggle-core"))
 
     // Logging API
     api("org.slf4j:slf4j-api:$slf4jVersion")
@@ -30,25 +28,6 @@ dependencies {
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-// Disable the standard jar task to prevent race conditions with shadowJar
-tasks.jar {
-    enabled = false
-}
-
-tasks.shadowJar {
-    archiveClassifier.set("")
-
-    dependencies {
-        include(project(":turbotoggle-core"))
-    }
-
-    relocate("com.turbotoggle.core", "com.turbotoggle.sdk.internal.core")
-}
-
-tasks.build {
-    dependsOn(tasks.shadowJar)
 }
 
 tasks.withType<Test> {
