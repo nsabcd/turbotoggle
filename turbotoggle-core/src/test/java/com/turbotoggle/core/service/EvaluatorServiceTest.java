@@ -13,6 +13,7 @@ public class EvaluatorServiceTest {
     private static String FLAG_DISABLED_REASON = "FLAG_DISABLED";
     private static  String INDIVIDUAL_TARGET_REASON= "INDIVIDUAL_TARGET";
     private static String RULE_MATCH_REASON = "RULE_MATCH";
+    private static final String DEFAULT_FALLBACK = "DEFAULT_FALLBACK";
 
     private EvaluatorService evaluatorService;
     @BeforeEach
@@ -143,4 +144,53 @@ public class EvaluatorServiceTest {
         assertEquals(false, result.value());
     }
 
+    @Test
+    @DisplayName("Should return DEFAULT reason when flag is enabled but no targeting rules or individual targets match")
+    void shouldReturnDefaultWhenNoRulesOrTargetsMatch() {
+        Clause clause = new Clause("tier", "EQUALS", List.of("ENTERPRISE"));
+        TargetingRule rule = new TargetingRule("rule-1", "treatment-enterprise", List.of(clause), List.of());
+
+        FlagConfigPayloadDto flag = new FlagConfigPayloadDto(
+                "enterprise-feature",
+                "STRING",
+                true,
+                "default-control",
+                List.of(rule),
+                Map.of("user-999", "special-override"),
+                1L
+        );
+        // Non-matching context user
+        EvaluationContextDto context = new EvaluationContextDto("user-100", Map.of("tier", "FREE"));
+
+        EvaluationResultDto result = evaluatorService.evaluate(flag, context);
+
+        assertEquals(DEFAULT_FALLBACK, result.reason());
+        assertEquals("default-control", result.variation());
+        assertEquals("default-control", result.value());
+    }
+
+    @Test
+    @DisplayName("Should resolve multiple data types correctly (INTEGER, DOUBLE, JSON/UNKNOWN)")
+    void shouldResolveVariousDataTypes() {
+        // Integer type test
+        FlagConfigPayloadDto intFlag = new FlagConfigPayloadDto(
+                "max-connections", "INTEGER", true, "100", List.of(), Map.of(), 1L
+        );
+        EvaluationResultDto intResult = evaluatorService.evaluate(intFlag, new EvaluationContextDto("u1", Map.of()));
+        assertEquals(100, intResult.value());
+
+        // Double type test
+        FlagConfigPayloadDto doubleFlag = new FlagConfigPayloadDto(
+                "discount-rate", "DOUBLE", true, "0.15", List.of(), Map.of(), 1L
+        );
+        EvaluationResultDto doubleResult = evaluatorService.evaluate(doubleFlag, new EvaluationContextDto("u1", Map.of()));
+        assertEquals(0.15d, doubleResult.value());
+
+        // Unknown / String fallback test
+        FlagConfigPayloadDto rawFlag = new FlagConfigPayloadDto(
+                "json-config", "JSON", true, "{\"key\":\"value\"}", List.of(), Map.of(), 1L
+        );
+        EvaluationResultDto rawResult = evaluatorService.evaluate(rawFlag, new EvaluationContextDto("u1", Map.of()));
+        assertEquals("{\"key\":\"value\"}", rawResult.value());
+    }
 }

@@ -14,4 +14,6 @@ public interface Operator {
     String NOT_CONTAINS = "NOT_CONTAINS";
     String IS_TRUE = "IS_TRUE";
     String IS_FALSE = "IS_FALSE";
+    String STARTS_WITH="STARTS_WITH";
+    String ENDS_WITH="ENDS_WITH";
 }

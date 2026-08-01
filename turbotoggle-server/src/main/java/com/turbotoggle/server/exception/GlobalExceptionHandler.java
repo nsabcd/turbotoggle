@@ -27,4 +27,9 @@ public class GlobalExceptionHandler {
                 "error", ex.getMessage() // ✅ Matches jsonPath("$.error") in test assertion
         ));
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }

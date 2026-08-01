@@ -83,18 +83,17 @@ public class EvaluatorService {
 
 
 
-    private Object resolveValueType(String rawValue, String flagType) {
+    private Object resolveValueType(String rawValue, String valueType) {
         if (rawValue == null) return null;
-        if ("BOOLEAN".equalsIgnoreCase(flagType)) {
-            return Boolean.parseBoolean(rawValue);
-        } else if ("NUMERIC".equalsIgnoreCase(flagType)) {
-            try {
-                return Double.parseDouble(rawValue);
-            } catch (NumberFormatException e) {
-                return rawValue;
-            }
+        if (rawValue == null || valueType == null) {
+            return rawValue;
         }
-        // Return raw string/JSON payload for STRING and JSON flag types
-        return rawValue;
+        return switch (valueType.toUpperCase()) {
+            case "BOOLEAN" -> Boolean.parseBoolean(rawValue);
+            case "INTEGER", "INT" -> Integer.parseInt(rawValue);
+            case "DOUBLE", "FLOAT" -> Double.parseDouble(rawValue);
+            default -> rawValue; // Default fallback to String (JSON, STRING, etc.)
+        };
+
     }
 }

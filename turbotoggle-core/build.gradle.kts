@@ -21,6 +21,9 @@ val slf4jVersion = "2.0.9"
 dependencies {
     // JSON Parsing
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:$jacksonVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
     // Logging API
     api("org.slf4j:slf4j-api:$slf4jVersion")
