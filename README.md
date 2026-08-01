@@ -6,7 +6,7 @@
 [![Coverage](https://img.shields.io/badge/coverage-80%25%20enforced-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**TurboToggle** is a high-performance, real-time feature flagging and targeted rollout platform designed as a light-weight, self-hosted alternative to LaunchDarkly. Built with **Spring Boot 3.3**, **Java 21 Virtual Threads**, **Redis Pub/Sub**, and **PostgreSQL/H2**, TurboToggle provides sub-5ms local evaluation latency and real-time streaming updates via Server-Sent Events (SSE).
+**TurboToggle** is a high-performance, real-time feature flagging and targeted rollout platform designed as a light-weight, self-hosted application. Built with **Spring Boot 3.3**, **Java 21 Virtual Threads**, **Redis Pub/Sub**, and **PostgreSQL/H2**, TurboToggle provides sub-5ms local evaluation latency and real-time streaming updates via Server-Sent Events (SSE).
 
 ---
 
