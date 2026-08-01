@@ -66,7 +66,7 @@ public class RulePayloadValidator {
             validatePercentageRollout(rule.getPercentageRollouts());
         }
     }
-    private void validatePercentageRollout(List<PercentageRollout> rollouts) {
+    protected void validatePercentageRollout(List<PercentageRollout> rollouts) {
         double totalPercentage = 0.0;
 
         for (PercentageRollout rollout : rollouts) {
@@ -84,7 +84,7 @@ public class RulePayloadValidator {
         }
     }
 
-    private void validateClause(Clause clause) {
+    protected void validateClause(Clause clause) {
         if (clause == null) {
             throw new InvalidRuleConfigurationException("Clause cannot be null.");
         }

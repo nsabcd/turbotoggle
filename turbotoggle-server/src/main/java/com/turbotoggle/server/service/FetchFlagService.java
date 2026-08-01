@@ -89,25 +89,30 @@ public class FetchFlagService {
     /**
      * Resolves the environment key from an SDK Key.
      */
-    public String getEnvKeyBySdkKey(String sdkKey) {// Short wait since mapping queries are very fast
+    public String getEnvKeyBySdkKey(String sdkKey) {
+        // Short wait since mapping queries are very fast
         String lockKey = "mapping:" + sdkKey;
-
+        log.info("Look for EnvKey for SdkKey [{}]...", sdkKey);
         for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
             // 1. Fast Path: Read mapping from Redis
             Optional<String> cachedEnvKey = cacheRepository.getEnvKeyBySdkKey(sdkKey);
             if (cachedEnvKey.isPresent()) {
+                log.info("envKey [{}] found in cache before lock SdkKey [{}]...", cachedEnvKey.get(),sdkKey);
                 return cachedEnvKey.get();
             }
-
+            log.info("Cache miss before lock SdkKey [{}]...",sdkKey);
             // 2. Try acquiring a distributed lock specifically for this SDK key mapping
             String lockValue = java.util.UUID.randomUUID().toString();
-            boolean acquired = cacheRepository.acquireLock(lockKey, lockValue, 3); // 3-second lock
-
+            log.info("Attempting lock for sdkKey[{}]...",sdkKey);
+            boolean acquired = cacheRepository.acquireLock(lockKey, lockValue, LOCK_DURATION_SECONDS); // 3-second lock
+            log.info("Lock status [{}] for sdkKey [{}]...",acquired, sdkKey);
             if (acquired) {
                 try {
+                    log.info("lock acquired after cache miss  SdkKey [{}]...",sdkKey);
                     // Double-check: Did another thread cache it while we waited for the lock?
                     cachedEnvKey = cacheRepository.getEnvKeyBySdkKey(sdkKey);
                     if (cachedEnvKey.isPresent()) {
+                        log.info("envKey [{}] found in cache after lock SdkKey [{}]...", cachedEnvKey.get(),sdkKey);
                         return cachedEnvKey.get();
                     }
 
@@ -116,11 +121,13 @@ public class FetchFlagService {
                     String envKey = envRepository.findBySdkKey(sdkKey)
                             .map(Environment::getEnvKey)
                             .orElseThrow(() -> new IllegalArgumentException("Invalid SDK Key: " + sdkKey));
-
+                    log.info("envKey [{}] found in DB after lock SdkKey [{}]...", envKey,sdkKey);
                     // 4. Populate Cache and return
                     cacheRepository.putEnvKeyMapping(sdkKey, envKey);
+                    log.info("envKey [{}] PUT into cache after lock SdkKey [{}]...", envKey,sdkKey);
                     return envKey;
                 } finally {
+                    log.info("Lock released for SdkKey [{}]...",sdkKey);
                     cacheRepository.releaseLock(lockKey, lockValue);
                 }
             }
@@ -128,7 +135,7 @@ public class FetchFlagService {
             // 5. Failed to acquire lock — another thread is querying DB. Backoff + Jitter.
             try {
                 long sleepTime = INITIAL_WAIT_MS * (1L << attempt) + (long) (Math.random() * 10);
-                log.debug("Lock busy for SDK mapping [{}]. Waiting {} ms (attempt {}/{})",
+                log.info("Lock busy for SDK mapping [{}]. Waiting {} ms (attempt {}/{})",
                         sdkKey, sleepTime, attempt + 1, MAX_RETRIES);
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
@@ -189,7 +196,7 @@ public class FetchFlagService {
                 throw new IllegalStateException("Thread interrupted while waiting for cache warmup", e);
             }
         }
-        log.warn("Exhauster retires waititng for lock on env [{}], executing safety DB fallback.", sdkKey);
+        log.warn("Exhausted retires waititng for lock on env [{}], executing safety DB fallback.", sdkKey);
         return configRepository.findAllFlagPayloadDtosBySdkKey(sdkKey);
     }
 

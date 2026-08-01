@@ -1,5 +1,8 @@
 package com.turbotoggle.core.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class Clause {
@@ -10,7 +13,10 @@ public class Clause {
     public Clause() {
     }
 
-    public Clause(String attribute, String operator, List<String> values) {
+    @JsonCreator
+    public Clause(@JsonProperty("attribute") String attribute,
+                  @JsonProperty("operator") String operator,
+                  @JsonProperty("values") List<String> values) {
         this.attribute = attribute;
         this.operator = operator;
         this.values = values;

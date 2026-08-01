@@ -11,6 +11,10 @@ import static com.turbotoggle.core.model.Operator.*;
 
 public class ClauseEvaluator {
     public boolean evaluate(Clause clause, EvaluationContextDto context) {
+        // Guard clause for null inputs
+        if (clause == null || clause.getOperator() == null) {
+            return false;
+        }
         Object attributeValue = resolveAttributeValue(clause.getAttribute(), context);
         if (attributeValue == null) {
             return false;
@@ -25,10 +29,14 @@ public class ClauseEvaluator {
             case NOT_EQUALS -> targetValues.stream().noneMatch(val -> val.equalsIgnoreCase(strAttrValue));
             case CONTAINS -> targetValues.stream().anyMatch(strAttrValue::contains);
             case NOT_CONTAINS -> targetValues.stream().noneMatch(strAttrValue::contains);
+            case STARTS_WITH -> targetValues.stream().anyMatch(strAttrValue::startsWith);
+            case ENDS_WITH -> targetValues.stream().anyMatch(strAttrValue::endsWith);
             case IN -> targetValues.contains(strAttrValue);
             case NOT_IN -> !targetValues.contains(strAttrValue);
             case GREATER_THAN -> compareNumbers(strAttrValue, targetValues) > 0;
             case LESS_THAN -> compareNumbers(strAttrValue, targetValues) < 0;
+            case LESS_THAN_OR_EQUAL -> compareNumbers(strAttrValue, targetValues) <= 0;
+            case GREATER_THAN_OR_EQUAL -> compareNumbers(strAttrValue, targetValues) >= 0;
             case IS_TRUE -> Boolean.parseBoolean(strAttrValue);
             case IS_FALSE -> !Boolean.parseBoolean(strAttrValue);
             default -> false;

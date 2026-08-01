@@ -1,5 +1,8 @@
 package com.turbotoggle.core.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class TargetingRule {
@@ -12,7 +15,11 @@ public class TargetingRule {
     public TargetingRule() {
     }
 
-    public TargetingRule(String ruleId, String variation, List<Clause> clauses, List<PercentageRollout> percentageRollouts) {
+    @JsonCreator
+    public TargetingRule(@JsonProperty("ruleId") String ruleId,
+                         @JsonProperty("variation") String variation,
+                         @JsonProperty("clauses") List<Clause> clauses,
+                         @JsonProperty("percentageRollouts") List<PercentageRollout> percentageRollouts) {
         this.ruleId = ruleId;
         this.variation = variation;
         this.clauses = clauses;
