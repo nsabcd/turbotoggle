@@ -23,6 +23,11 @@ subprojects {
         }
     }
 
+    tasks.withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.compilerArgs.add("-parameters")
+    }
+
     tasks.withType<Test> {
         // Pass JVM arg to suppress Java 21 dynamic agent loading warnings (Mockito/ByteBuddy/JaCoCo)
         jvmArgs("-XX:+EnableDynamicAgentLoading")

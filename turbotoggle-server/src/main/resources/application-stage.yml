@@ -8,9 +8,14 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
 
+  flyway:
+    enabled: true
+    baseline-on-migrate: true # Useful when migrating an existing database
+    locations: classpath:db/migration
+
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: validate # Flyway executes DDLs; Hibernate only validates schema alignment
     show-sql: false
 
   data:

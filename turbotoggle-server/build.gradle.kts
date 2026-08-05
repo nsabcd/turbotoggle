@@ -26,15 +26,23 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation(project(":turbotoggle-core"))
 
+	// Database Migrations (Flyway)
+	implementation("org.flywaydb:flyway-core")
+	implementation("org.flywaydb:flyway-database-postgresql")
+
+	// Hypersistence Utilities for Jackson JSONB / Postgres Types with Hibernate 6
+	implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.2")
+
 	// Database Drivers
 	runtimeOnly("org.postgresql:postgresql")
 	runtimeOnly("com.h2database:h2")
 
 	// Testing
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	// ADD THIS LINE: Explicitly provide the launcher to Gradle's test runner
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	testImplementation("org.testcontainers:junit-jupiter")
+	testImplementation("org.testcontainers:postgresql")
 	testImplementation("com.redis:testcontainers-redis:2.2.4")
 }
 
